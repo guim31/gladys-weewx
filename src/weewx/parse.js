@@ -173,9 +173,16 @@ function measure(entry, group) {
   return group ? convert(value, group, entry.units) : value;
 }
 
-/** A date of a skin: ISO with a `+0200` offset, or a date Date can parse. */
+/**
+ * A date of the weewx-json skin: ISO 8601 with a `+0200` offset. Its "human"
+ * format follows the locale (`05/10/2026` is May or October): not guessed,
+ * the file is then dated by its Last-Modified header.
+ */
 function parseDate(text) {
-  if (typeof text !== 'string' || text.trim() === '') {
+  if (
+    typeof text !== 'string' ||
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:?\d{2})$/.test(text.trim())
+  ) {
     return null;
   }
   const iso = text.trim().replace(/([+-]\d{2})(\d{2})$/, '$1:$2');

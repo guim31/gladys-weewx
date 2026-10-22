@@ -177,7 +177,7 @@ export const FEATURES = [
     unit: U.UV_INDEX,
     min: 0,
     max: 20,
-    read: ({ reading }) => round(reading?.uv, 1),
+    read: ({ reading }) => round(reading?.uv, 0),
   },
   {
     // No W/m² unit in Gladys: the unit is in the name.

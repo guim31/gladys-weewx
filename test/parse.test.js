@@ -147,3 +147,12 @@ test('an unknown file is no format; the action counts the values', () => {
   assert.equal(parseHttpPayload({ hello: 'world' }), null);
   assert.ok(countValues(readingFromFlat(FIXTURES.loop)) >= 15);
 });
+
+test('weewx-json dates: ISO only, a locale date is not guessed', () => {
+  const human = structuredClone(FIXTURES.weewxJson);
+  human.generation.time = '05/10/2026 06:00:00';
+  assert.equal(parseHttpPayload(human).reading.time, null);
+  const colon = structuredClone(FIXTURES.weewxJson);
+  colon.generation.time = '2026-10-22T07:47:00+02:00';
+  assert.equal(parseHttpPayload(colon).reading.time, Date.parse('2026-10-22T05:47:00Z'));
+});

@@ -35,7 +35,14 @@ export async function readHttpSource(address, { fetch: fetchFn = globalThis.fetc
   const headers = { accept: 'application/json' };
   // fetch() refuses a URL with credentials: they become a basic auth header.
   if (url.username || url.password) {
-    const credentials = `${decodeURIComponent(url.username)}:${decodeURIComponent(url.password)}`;
+    const decode = (value) => {
+      try {
+        return decodeURIComponent(value);
+      } catch {
+        return value;
+      }
+    };
+    const credentials = `${decode(url.username)}:${decode(url.password)}`;
     headers.authorization = `Basic ${Buffer.from(credentials).toString('base64')}`;
     url.username = '';
     url.password = '';

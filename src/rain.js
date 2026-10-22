@@ -35,7 +35,8 @@ export function createDayRain({ dayOf = localDay } = {}) {
   const extra = () =>
     packets
       .filter(
-        (packet) => (baseTime === null || packet.time > baseTime) && dayOf(packet.time - 1) === day,
+        (packet) =>
+          (baseTime === null || packet.time >= baseTime) && dayOf(packet.time - 1) === day,
       )
       .reduce((sum, packet) => sum + packet.rain, 0);
 
@@ -50,13 +51,37 @@ export function createDayRain({ dayOf = localDay } = {}) {
       const readingDay = dayOf(reading.time - 1);
       const newest = reading.time >= latest;
       latest = Math.max(latest, reading.time);
-      if (reading.rainToday !== null) {
-        // An older day's total (a late record) says nothing about today.
+      if (reading.rainToday !== null && reading.archive) {
+        // An archive record's total includes its own interval: exact at its
+        // time. An older day's total (a late record) says nothing about today.
         if (day === null || readingDay === day || newest) {
           day = readingDay;
           base = reading.rainToday;
           baseTime = reading.time;
         }
+        return;
+      }
+      if (reading.rainToday !== null) {
+        // A loop packet's total comes from the archive table: it misses the
+        // interval in progress, a lower bound only. Its own rain still adds up.
+        if (day !== readingDay && newest) {
+          day = readingDay;
+          base = null;
+          baseTime = null;
+        }
+        if (day === readingDay) {
+          const current = base === null ? null : base + extra();
+          if (current === null || reading.rainToday > current) {
+            base = reading.rainToday;
+            // This packet's own rain is not in the total: it counts on top.
+            baseTime = reading.time - 1;
+          }
+        }
+        if (reading.rainInterval === null) {
+          return;
+        }
+        packets.push({ time: reading.time, rain: reading.rainInterval });
+        packets = packets.filter((packet) => packet.time > reading.time - KEEP_MS);
         return;
       }
       if (reading.archive || reading.rainInterval === null) {

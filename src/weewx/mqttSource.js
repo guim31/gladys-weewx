@@ -12,6 +12,15 @@ import mqtt from 'mqtt';
 import { randomBytes } from 'node:crypto';
 import { readingFromFlat } from './parse.js';
 
+/** A percent-encoded URL part; a malformed one is kept as typed. */
+function decode(value) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export const RECONNECT_PERIOD_MS = 15 * 1000;
 export const CONNECT_TIMEOUT_MS = 10 * 1000;
 
@@ -42,8 +51,8 @@ export function createMqttSource({
   const parsed = new URL(url);
   // Credentials typed in the URL (mqtt://user:pass@host) are honoured, the
   // dedicated fields win.
-  const user = username || decodeURIComponent(parsed.username);
-  const pass = password || decodeURIComponent(parsed.password);
+  const user = username || decode(parsed.username);
+  const pass = password || decode(parsed.password);
   parsed.username = '';
   parsed.password = '';
 

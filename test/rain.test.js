@@ -55,3 +55,15 @@ test('a source without rain says nothing', () => {
   rain.update(at(null, { rainToday: 1 }));
   assert.equal(rain.value(5100), null);
 });
+
+test('a loop packet total misses the interval in progress: its rain adds on top', () => {
+  const rain = createDayRain({ dayOf });
+  // weewx-mqtt augments loop packets from the archive table.
+  rain.update(at(5100, { rainToday: 2, rainInterval: 0.1 }));
+  rain.update(at(5110, { rainToday: 2, rainInterval: 0.2 }));
+  assert.equal(Math.round(rain.value(5110) * 10) / 10, 2.3);
+  // The archive record of the interval: exact, the next packets on top.
+  rain.update(at(5120, { rainToday: 2.3, archive: true, rainInterval: 0.3 }));
+  rain.update(at(5130, { rainToday: 2.3, rainInterval: 0.1 }));
+  assert.equal(Math.round(rain.value(5130) * 10) / 10, 2.4);
+});

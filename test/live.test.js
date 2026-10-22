@@ -389,3 +389,47 @@ test('closing the broker connection on purpose is not an outage', async (t) => {
   await flush();
   assert.equal(world.gladys.fake.connectionStatus.connected, true);
 });
+
+test('a value the packets stop carrying is forgotten after 30 minutes', async (t) => {
+  const world = await mqttWorld(t, { config: { language: 'en' } });
+  world.broker.publish(FIXTURES.loop);
+  await flush();
+  for (let i = 1; i <= 31; i += 1) {
+    const packet = loopPacket(60 * i);
+    delete packet.outTemp_C;
+    world.broker.publish(packet);
+    await world.advance(MINUTE);
+  }
+  const ack = await world.gladys.fake.sceneAction('current_conditions', {});
+  assert.equal(ack.data.outputs.temperature, null);
+  assert.equal(ack.data.outputs.humidity, 80);
+});
+
+test('a WeeWX clock in the future does not freeze the readings', async (t) => {
+  const world = await mqttWorld(t);
+  world.broker.publish(loopPacket(3600));
+  await flush();
+  world.broker.publish(loopPacket(10, { outTemp_C: '7.0' }));
+  await world.advance(SECOND);
+  world.broker.publish(loopPacket(20, { outTemp_C: '8.0' }));
+  await world.advance(SECOND);
+  assert.equal(world.hub.data().reading.temperature, 8);
+});
+
+test('a refused discovery, then accepted: Gladys told the integration is fine again', async (t) => {
+  const world = await mqttWorld(t);
+  const original = world.gladys.publishDiscoveredDevices.bind(world.gladys);
+  let fail = true;
+  t.mock.method(world.gladys, 'publishDiscoveredDevices', async (devices) => {
+    if (fail) {
+      throw new Error('400');
+    }
+    return original(devices);
+  });
+  world.broker.publish(FIXTURES.loop);
+  await flush();
+  assert.equal(world.gladys.fake.connectionStatus.connected, false);
+  fail = false;
+  await world.gladys.fake.scanRequest();
+  assert.equal(world.gladys.fake.connectionStatus.connected, true);
+});

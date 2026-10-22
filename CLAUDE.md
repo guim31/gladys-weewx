@@ -258,6 +258,13 @@ Belchertown, le 22/10/2026 (captures dans `test/fixtures/weewx/`).
   `src/rain.js` additionne alors les `rain` de boucle, et reste « inconnu » jusqu'à minuit plutôt
   que faux. WeeWX date un enregistrement de la **fin** de son intervalle : celui de 00:00 clôt la
   veille.
+- Le `dayRain` d'un **paquet de boucle** vient de la table d'archive : il manque l'intervalle en cours.
+  C'est un minorant ; la pluie du paquet s'ajoute dessus. Seul celui d'un enregistrement d'archive est
+  exact à sa date (relevé par la relecture du 22/10).
+- Une valeur que les paquets ne portent plus (sonde morte) est oubliée après 30 min
+  (`VALUE_EXPIRY_MS`) ; une date WeeWX plus de 5 min dans le futur est ramenée à l'heure du
+  conteneur, sinon toutes les mesures suivantes paraîtraient plus vieilles et seraient jetées. Le
+  format « human » de weewx-json dépend de la locale : jamais deviné, `Last-Modified` le remplace.
 - Les skins produisent par défaut en **unités US**. weewx-json : `{ value, units }`, date
   `2026-10-22T05:47:00+0000` (offset sans deux-points) ou format « human » (alors `Last-Modified`).
   Belchertown : chaînes formatées avec **entités HTML** (`"32.7 &#176;F"`, `"W/m&#178;"`), `"N/A"`.

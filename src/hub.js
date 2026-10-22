@@ -41,6 +41,16 @@ const LANGS = ['en', 'fr', 'de', 'es'];
 // Silence after which the logs say the measurements are lost (and back).
 const LOST_AFTER_MINUTES = 15;
 
+// A value the measurements stopped carrying (a dead sensor) is forgotten
+// after this, rather than shown forever.
+export const VALUE_EXPIRY_MS = 30 * 60 * 1000;
+
+// A WeeWX clock running ahead: its time is not trusted beyond this, or every
+// later measurement would look older and be dropped.
+const FUTURE_TOLERANCE_MS = 5 * 60 * 1000;
+
+const META_KEYS = new Set(['time', 'archive', 'stationName', 'rainInterval']);
+
 /** Rain right now: a rain rate, or rain since the previous measurement. */
 export function isRaining(reading) {
   if (!reading) {
@@ -91,6 +101,7 @@ export class WeewxHub {
     this.httpFormat = null;
     this.stationName = null;
     this.seen = new Set();
+    this.valueAt = new Map();
     this.dayRain = createDayRain();
     this.triggers = createTriggerTracker({ now });
     this.lastNewDataAt = null;
@@ -111,6 +122,8 @@ export class WeewxHub {
     this.stopSources();
     this.generation += 1;
     this.config = config;
+    // Sent again after a reconnection: Gladys may have restarted.
+    this.status = null;
     this.http = { state: null, error: null };
     this.triggers.resetSilence();
     if (!isConfigured(config)) {
@@ -267,6 +280,12 @@ export class WeewxHub {
     if (reading.time === null) {
       return;
     }
+    if (reading.time > this.now() + FUTURE_TOLERANCE_MS) {
+      this.issues.fail('clock', 'WeeWX dates its measurements in the future: check its clock');
+      reading = { ...reading, time: this.now() };
+    } else {
+      this.issues.ok('clock', 'WeeWX clock back in time');
+    }
     this.dayRain.update(reading);
     if (reading.stationName) {
       this.stationName = reading.stationName;
@@ -278,6 +297,11 @@ export class WeewxHub {
       this.readingSource = source;
     }
     if (isNew) {
+      for (const [key, value] of Object.entries(reading)) {
+        if (value !== null && value !== undefined && !META_KEYS.has(key)) {
+          this.valueAt.set(key, this.now());
+        }
+      }
       if (this.lastNewDataAt === null) {
         logger.info(`First measurement received from WeeWX (${source})`);
       } else if (this.now() - this.lastNewDataAt >= LOST_AFTER_MINUTES * 60 * 1000) {
@@ -299,12 +323,27 @@ export class WeewxHub {
     this.schedulePublish();
   }
 
+  /** The latest reading, without the values not refreshed for VALUE_EXPIRY_MS. */
+  currentReading() {
+    if (!this.reading) {
+      return null;
+    }
+    const reading = { ...this.reading };
+    for (const [key, at] of this.valueAt) {
+      if (this.now() - at > VALUE_EXPIRY_MS) {
+        reading[key] = null;
+      }
+    }
+    return reading;
+  }
+
   /** The data the features and the widget read. */
   data() {
+    const reading = this.currentReading();
     return {
-      reading: this.reading,
+      reading,
       rainToday: this.dayRain.value(this.now()),
-      raining: isRaining(this.reading),
+      raining: isRaining(reading),
       ageMinutes:
         this.lastNewDataAt === null
           ? null
@@ -368,6 +407,10 @@ export class WeewxHub {
     try {
       await this.gladys.publishDiscoveredDevices(this.discoveredDevices());
       this.issues.ok('discovery', 'Gladys accepts the station again');
+      if (this.status === 'publish-failed') {
+        this.status = null;
+        await this.updateStatus();
+      }
     } catch (err) {
       this.issues.fail('discovery', `Publishing the station failed: ${err.message}`);
       await this.gladys
@@ -465,7 +508,9 @@ export class WeewxHub {
   async checkSources() {
     const { config } = this;
     if (!config || !isConfigured(config)) {
-      throw new Error(MESSAGES.notConfigured.en);
+      throw new Error(
+        MESSAGES.notConfigured[config?.language ?? 'en'] ?? MESSAGES.notConfigured.en,
+      );
     }
     const lines = Object.fromEntries(LANGS.map((lang) => [lang, []]));
     const add = (fn) => {
