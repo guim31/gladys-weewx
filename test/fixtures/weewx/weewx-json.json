@@ -1,0 +1,144 @@
+{
+  "station": {
+    "location": "Test station",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "altitude (meters)": 0.0,
+    "link": ""
+  },
+  "generation": {
+    "time": "2026-10-22T05:47:00+0000",
+    "generator": "weewx 5.4.0"
+  },
+  "current": {
+    "temperature": { "value": 32.65773027900974, "units": "°F" },
+    "dewpoint": { "value": 27.18323051897522, "units": "°F" },
+    "humidity": { "value": 79.99997621209883, "units": "%" },
+    "heat index": { "value": 32.65773027900974, "units": "°F" },
+    "barometer": { "value": 31.09999920706997, "units": "inHg" },
+    "wind speed": { "value": 3.964650194957879e-6, "units": "mph" },
+    "wind gust": { "value": 1.3690177905090195e-5, "units": "mph" },
+    "wind direction": { "value": 359.99974323942945, "units": "°" },
+    "wind chill": { "value": 32.65773027900974, "units": "°F" },
+    "rain rate": { "value": 0.0, "units": "in/h" },
+    "inside temperature": { "value": 63.000015858589485, "units": "°F" },
+    "inside humidity": { "value": 29.99996828282106, "units": "%" },
+    "void_end": null
+  },
+  "day": {
+    "max temperature": { "value": 32.67858297022247, "units": "°F", "at": "05:46:01" },
+    "min temperature": { "value": 32.63692592901923, "units": "°F", "at": "05:46:58" },
+    "max dewpoint": { "value": 27.203560993945757, "units": "°F", "at": "05:46:01" },
+    "min dewpoint": { "value": 27.16294081380911, "units": "°F", "at": "05:46:58" },
+    "max humidity": { "value": 79.99999996901272, "units": "%", "at": "05:46:01" },
+    "min humidity": { "value": 79.99993154911047, "units": "%", "at": "05:46:58" },
+    "max barometer": { "value": 31.099999998967093, "units": "inHg", "at": "05:46:01" },
+    "min barometer": { "value": 31.099997718303683, "units": "inHg", "at": "05:46:58" },
+    "max wind speed": { "value": 3.964650194957879e-6, "units": "mph", "at": "05:47:00" },
+    "max wind gust": { "value": 1.3690177905090195e-5, "units": "mph", "at": "05:46:58" },
+    "max rain rate": { "value": 0.0, "units": "in/h", "at": "05:46:01" },
+    "rain total": { "value": 0.0, "units": "in" },
+    "max inside temperature": { "value": 63.000045633874294, "units": "°F", "at": "05:46:58" },
+    "min inside temperature": { "value": 63.00000002065819, "units": "°F", "at": "05:46:01" },
+    "max inside humidity": { "value": 29.999999958683617, "units": "%", "at": "05:46:01" },
+    "min inside humidity": { "value": 29.99990873225142, "units": "%", "at": "05:46:58" },
+    "void_end": null
+  },
+  "week": {
+    "max temperature": { "value": 32.67858297022247, "units": "°F", "at": "05:46:01 (Thursday)" },
+    "min temperature": { "value": 32.63692592901923, "units": "°F", "at": "05:46:58 (Thursday)" },
+    "max dewpoint": { "value": 27.203560993945757, "units": "°F", "at": "05:46:01 (Thursday)" },
+    "min dewpoint": { "value": 27.16294081380911, "units": "°F", "at": "05:46:58 (Thursday)" },
+    "max humidity": { "value": 79.99999996901272, "units": "%", "at": "05:46:01 (Thursday)" },
+    "min humidity": { "value": 79.99993154911047, "units": "%", "at": "05:46:58 (Thursday)" },
+    "max barometer": { "value": 31.099999998967093, "units": "inHg", "at": "05:46:01 (Thursday)" },
+    "min barometer": { "value": 31.099997718303683, "units": "inHg", "at": "05:46:58 (Thursday)" },
+    "max wind speed": {
+      "value": 3.964650194957879e-6,
+      "units": "mph",
+      "at": "05:47:00 (Thursday)"
+    },
+    "max wind gust": {
+      "value": 1.3690177905090195e-5,
+      "units": "mph",
+      "at": "05:46:58 (Thursday)"
+    },
+    "max rain rate": { "value": 0.0, "units": "in/h", "at": "05:46:01 (Thursday)" },
+    "rain total": { "value": 0.0, "units": "in" },
+    "max inside temperature": {
+      "value": 63.000045633874294,
+      "units": "°F",
+      "at": "05:46:58 (Thursday)"
+    },
+    "min inside temperature": {
+      "value": 63.00000002065819,
+      "units": "°F",
+      "at": "05:46:01 (Thursday)"
+    },
+    "max inside humidity": {
+      "value": 29.999999958683617,
+      "units": "%",
+      "at": "05:46:01 (Thursday)"
+    },
+    "min inside humidity": {
+      "value": 29.99990873225142,
+      "units": "%",
+      "at": "05:46:58 (Thursday)"
+    },
+    "void_end": null
+  },
+  "month": {
+    "max temperature": { "value": 32.67858297022247, "units": "°F", "at": "10/22/26 05:46:01" },
+    "min temperature": { "value": 32.63692592901923, "units": "°F", "at": "10/22/26 05:46:58" },
+    "max dewpoint": { "value": 27.203560993945757, "units": "°F", "at": "10/22/26 05:46:01" },
+    "min dewpoint": { "value": 27.16294081380911, "units": "°F", "at": "10/22/26 05:46:58" },
+    "max humidity": { "value": 79.99999996901272, "units": "%", "at": "10/22/26 05:46:01" },
+    "min humidity": { "value": 79.99993154911047, "units": "%", "at": "10/22/26 05:46:58" },
+    "max barometer": { "value": 31.099999998967093, "units": "inHg", "at": "10/22/26 05:46:01" },
+    "min barometer": { "value": 31.099997718303683, "units": "inHg", "at": "10/22/26 05:46:58" },
+    "max wind speed": { "value": 3.964650194957879e-6, "units": "mph", "at": "10/22/26 05:47:00" },
+    "max wind gust": { "value": 1.3690177905090195e-5, "units": "mph", "at": "10/22/26 05:46:58" },
+    "max rain rate": { "value": 0.0, "units": "in/h", "at": "10/22/26 05:46:01" },
+    "rain total": { "value": 0.0, "units": "in" },
+    "max inside temperature": {
+      "value": 63.000045633874294,
+      "units": "°F",
+      "at": "10/22/26 05:46:58"
+    },
+    "min inside temperature": {
+      "value": 63.00000002065819,
+      "units": "°F",
+      "at": "10/22/26 05:46:01"
+    },
+    "max inside humidity": { "value": 29.999999958683617, "units": "%", "at": "10/22/26 05:46:01" },
+    "min inside humidity": { "value": 29.99990873225142, "units": "%", "at": "10/22/26 05:46:58" },
+    "void_end": null
+  },
+  "year": {
+    "max temperature": { "value": 32.67858297022247, "units": "°F", "at": "10/22/26 05:46:01" },
+    "min temperature": { "value": 32.63692592901923, "units": "°F", "at": "10/22/26 05:46:58" },
+    "max dewpoint": { "value": 27.203560993945757, "units": "°F", "at": "10/22/26 05:46:01" },
+    "min dewpoint": { "value": 27.16294081380911, "units": "°F", "at": "10/22/26 05:46:58" },
+    "max humidity": { "value": 79.99999996901272, "units": "%", "at": "10/22/26 05:46:01" },
+    "min humidity": { "value": 79.99993154911047, "units": "%", "at": "10/22/26 05:46:58" },
+    "max barometer": { "value": 31.099999998967093, "units": "inHg", "at": "10/22/26 05:46:01" },
+    "min barometer": { "value": 31.099997718303683, "units": "inHg", "at": "10/22/26 05:46:58" },
+    "max wind speed": { "value": 3.964650194957879e-6, "units": "mph", "at": "10/22/26 05:47:00" },
+    "max wind gust": { "value": 1.3690177905090195e-5, "units": "mph", "at": "10/22/26 05:46:58" },
+    "max rain rate": { "value": 0.0, "units": "in/h", "at": "10/22/26 05:46:01" },
+    "rain total": { "value": 0.0, "units": "in" },
+    "max inside temperature": {
+      "value": 63.000045633874294,
+      "units": "°F",
+      "at": "10/22/26 05:46:58"
+    },
+    "min inside temperature": {
+      "value": 63.00000002065819,
+      "units": "°F",
+      "at": "10/22/26 05:46:01"
+    },
+    "max inside humidity": { "value": 29.999999958683617, "units": "%", "at": "10/22/26 05:46:01" },
+    "min inside humidity": { "value": 29.99990873225142, "units": "%", "at": "10/22/26 05:46:58" },
+    "void_end": null
+  }
+}

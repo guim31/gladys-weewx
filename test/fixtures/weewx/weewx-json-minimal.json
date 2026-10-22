@@ -1,0 +1,23 @@
+{
+  "station": {
+    "location": "Test station",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "altitude (meters)": 0.0,
+    "link": ""
+  },
+  "generation": {
+    "time": "2026-10-22T05:47:00+0000",
+    "generator": "weewx 5.4.0"
+  },
+  "current": {
+    "temperature": { "value": 32.65773027900974, "units": "°F" },
+    "humidity": { "value": 79.99997621209883, "units": "%" },
+    "barometer": { "value": 31.09999920706997, "units": "inHg" },
+    "wind speed": { "value": 3.964650194957879e-6, "units": "mph" },
+    "wind gust": { "value": 1.3690177905090195e-5, "units": "mph" },
+    "wind direction": { "value": 359.99974323942945, "units": "°" },
+    "rain rate": { "value": 0.0, "units": "in/h" },
+    "void_end": null
+  }
+}

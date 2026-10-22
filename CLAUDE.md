@@ -31,15 +31,22 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
+index.js                          SDK wiring only (src/app.js registers the handlers)
+src/app.js                        handlers: discovery, action, scene action, widget, config
+src/hub.js                        sources, latest reading, throttled states, scene events, clock
+src/devices.js                    the station device: features (keys are forever) and states
+src/rain.js                       rain of the day: dayRain + loop packets, zero at midnight
+src/triggers.js                   rain episodes, dry spells, gust thresholds, silences
 src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+src/widgets.js                    dashboard widget handler (manifest `widgets`)
+src/i18n.js                       every text, en/fr/de/es
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
+src/weewx/units.js                WeeWX unit labels and systems -> °C, km/h, hPa, mm, mm/h
+src/weewx/parse.js                weewx-mqtt / weewx-json / Belchertown payloads -> reading
+src/weewx/mqttSource.js           MQTT client (mqtt.js), link state, readings
+src/weewx/httpSource.js           JSON file reader (basic auth, Last-Modified fallback)
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
+docs/en.md, fr.md, de.md, es.md   user documentation, re-hosted by Gladys (mandatory)
 test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
@@ -70,8 +77,9 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** exists in English, French, German and Spanish: action
+  messages, manifest texts, widget texts, feature names, and the four docs
+  `docs/{en,fr,de,es}.md`, kept in sync (`test/i18n.test.js`).
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -233,3 +241,42 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## WeeWX (propre à cette intégration)
+
+Vérifié sur WeeWX 5.4.0 (image `felddy/weewx`, pilote Simulator), weewx-mqtt, weewx-json et
+Belchertown, le 22/10/2026 (captures dans `test/fixtures/weewx/`).
+
+- **weewx-mqtt** publie le paquet agrégé sur `<topic>/loop` **quel que soit `binding`** (archive,
+  loop ou les deux) : `weather/loop` reçoit donc aussi les enregistrements d'archive, reconnaissables
+  à `interval_minute`. Toutes les valeurs sont des **chaînes** (`"1.0e-06"` compris). Les clés portent
+  l'unité (`outTemp_C`, `rain_cm`, `rainRate_cm_per_hour`, `barometer_mbar`, `windSpeed_kph`) sauf
+  avec `append_units_label = false` : l'unité se déduit alors de `usUnits` (1 US, 16 METRIC,
+  17 METRICWX). Une unité inconnue fait tomber la valeur, jamais de supposition.
+- `dayRain` n'arrive dans les paquets (boucle comme archive) que si la base de WeeWX a déjà des
+  enregistrements (`augment_record`, actif par défaut) : les tout premiers paquets n'en ont pas.
+  `src/rain.js` additionne alors les `rain` de boucle, et reste « inconnu » jusqu'à minuit plutôt
+  que faux. WeeWX date un enregistrement de la **fin** de son intervalle : celui de 00:00 clôt la
+  veille.
+- Le `dayRain` d'un **paquet de boucle** vient de la table d'archive : il manque l'intervalle en cours.
+  C'est un minorant ; la pluie du paquet s'ajoute dessus. Seul celui d'un enregistrement d'archive est
+  exact à sa date (relevé par la relecture du 22/10).
+- Une valeur que les paquets ne portent plus (sonde morte) est oubliée après 30 min
+  (`VALUE_EXPIRY_MS`) ; une date WeeWX plus de 5 min dans le futur est ramenée à l'heure du
+  conteneur, sinon toutes les mesures suivantes paraîtraient plus vieilles et seraient jetées. Le
+  format « human » de weewx-json dépend de la locale : jamais deviné, `Last-Modified` le remplace.
+- Les skins produisent par défaut en **unités US**. weewx-json : `{ value, units }`, date
+  `2026-10-22T05:47:00+0000` (offset sans deux-points) ou format « human » (alors `Last-Modified`).
+  Belchertown : chaînes formatées avec **entités HTML** (`"32.7 &#176;F"`, `"W/m&#178;"`), `"N/A"`.
+- Le Simulator bascule ses `…BatteryStatus` au hasard : un paquet avec `batteryLow` vrai est normal.
+  Certains pilotes mettent une tension dans ces champs : seules les valeurs entières comptent.
+- Fichier HTTP réécrit une fois par intervalle d'archive (5 min) : « Station muette » à 5 min se
+  déclencherait sans cesse en HTTP, d'où la mise en garde de la doc ; le journal ne parle de
+  perte qu'à 15 min.
+- Débit : un paquet toutes les 2 à 5 s en MQTT ; les états partent au plus toutes les 15 s
+  (`publishMinMs`), seulement les changements, battement de cœur 6 h. Les déclencheurs voient
+  chaque paquet.
+- Faux Gladys du SDK : l'ack d'une action enveloppe le retour dans `data.message`, celui d'une action
+  de scène dans `data.outputs`.
+- Test Docker : WeeWX + Mosquitto + un serveur HTTP sur le volume `public_html`, ressources
+  `gladys-test-weewx*` (voir le rapport de la PR #4).
