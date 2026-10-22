@@ -1,41 +1,45 @@
 // -----------------------------------------------------------------------------
-// Scene actions (SDK v0.14+, Gladys 5.1+).
+// Scene action handlers (manifest `scene_actions`).
 //
-// A scene action is an OPERATION a scene author places in a scene, with
-// parameters and a result: "identify this device", "take a snapshot", "clean
-// these rooms". Each one is declared in the manifest `scene_actions` field
-// (key, label, `fields` in the config_schema grammar, scalar `outputs`) and
-// handled here, keyed by that same `key`; index.js registers every entry with
-// `gladys.onSceneAction(key, ...)`.
-//
-// Scene TRIGGERS are the other direction ("this happened"): they are fired by
-// the device that observes the event, see src/devices/motionSensor.js.
-//
-// The rules that matter:
-//   - `fields` arrive RESOLVED: scene variables substituted, defaults applied,
-//     validated by the core; a `"source": "devices"` field is the chosen
-//     device external_id;
-//   - resolve an object of the declared `outputs` (scalars only), readable by
-//     the following actions of the scene, or `undefined` for none. Keys not
-//     declared in the manifest are dropped by the core;
-//   - throwing fails THIS action only: the scene logs it and continues. A
-//     scene action is never a condition: return an output and let the scene
-//     author gate on it;
-//   - never fire a scene event as a consequence of a received action: a scene
-//     bound to that event would loop through the integration.
+// `current_conditions` — the current conditions of the station as a
+// ready-made sentence ("12.4 °C, feels like 10 °C, humidity 81 %, wind SW
+// 15 km/h, gusts 32 km/h.") plus its numbers, for a morning message or a
+// "close the awning" scene. The values also exist as device features; the
+// sentence is what a feature cannot give. Its language is the one of the
+// configuration (a scene action does not receive the user's language).
 // -----------------------------------------------------------------------------
 
-import { createLogger } from '@gladysassistant/integration-sdk';
-import { signalDevice } from './devices/index.js';
+import { conditionsSentence } from './i18n.js';
 
-const logger = createLogger({ name: 'scenes' });
-
-export const SCENE_ACTIONS = {
-  // The ack is awaited under the action's `timeout_seconds` (15 s in the
-  // manifest), counted from the moment the scene reaches the action.
-  async identify_device(gladys, { fields, config }) {
-    logger.info(`Scene action identify_device <- ${fields.device}`);
-    const signalled = await signalDevice(gladys, fields.device, config);
-    return { signalled };
-  },
+export const SCENE_ACTION = {
+  CURRENT_CONDITIONS: 'current_conditions',
 };
+
+const rounded = (value, decimals = 1) => {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return null;
+  }
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
+};
+
+/**
+ * @param {import('./hub.js').WeewxHub} hub
+ */
+export function currentConditions(hub) {
+  const data = hub.data();
+  const { reading } = data;
+  if (!reading) {
+    throw new Error('No measurement received from WeeWX yet');
+  }
+  return {
+    summary: conditionsSentence(reading, data, hub.config?.language ?? 'fr'),
+    temperature: rounded(reading.temperature),
+    humidity: rounded(reading.humidity, 0),
+    wind_speed: rounded(reading.windSpeed),
+    wind_gust: rounded(reading.windGust),
+    rain_today: rounded(data.rainToday),
+    raining: data.raining ?? false,
+    minutes_since_measurement: data.ageMinutes,
+  };
+}

@@ -1,33 +1,40 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeConfig, DEFAULT_CONFIG } from '../src/config.js';
+import { DEFAULT_CONFIG, isConfigured, normalizeConfig, safeUrl } from '../src/config.js';
 
-test('normalizeConfig returns the defaults when called with no argument', () => {
-  assert.deepEqual(normalizeConfig(), DEFAULT_CONFIG);
+test('defaults: nothing configured, French, weather/loop, one minute', () => {
+  const config = normalizeConfig();
+  assert.deepEqual(config, DEFAULT_CONFIG);
+  assert.equal(isConfigured(config), false);
 });
 
-test('normalizeConfig keeps user values over the defaults', () => {
-  const config = normalizeConfig({ latitude: 45.5, longitude: -73.6, unit: 'fahrenheit' });
-  assert.equal(config.latitude, 45.5);
-  assert.equal(config.longitude, -73.6);
-  assert.equal(config.unit, 'fahrenheit');
+test('the broker address gets its scheme; anything else is refused', () => {
+  assert.equal(normalizeConfig({ mqtt_url: ' 192.0.2.10 ' }).mqtt_url, 'mqtt://192.0.2.10');
+  assert.equal(normalizeConfig({ mqtt_url: 'broker:1883' }).mqtt_url, 'mqtt://broker:1883');
+  assert.equal(normalizeConfig({ mqtt_url: 'mqtts://b:8883' }).mqtt_url, 'mqtts://b:8883');
+  assert.equal(normalizeConfig({ mqtt_url: 'http://b' }).mqtt_url, '');
+  assert.equal(normalizeConfig({ http_url: 'ftp://h/x.json' }).http_url, '');
+  assert.equal(normalizeConfig({ http_url: 'http://h/x.json' }).http_url, 'http://h/x.json');
+  assert.equal(isConfigured(normalizeConfig({ http_url: 'http://h/x.json' })), true);
 });
 
-test('normalizeConfig coerces numeric strings coming from a form', () => {
-  const config = normalizeConfig({ latitude: '48.8', longitude: '2.3', poll_frequency: '600' });
-  assert.equal(config.latitude, 48.8);
-  assert.equal(config.longitude, 2.3);
-  assert.equal(config.poll_frequency, 600);
-  assert.equal(typeof config.poll_frequency, 'number');
+test('interval bounded, topic defaulted, language checked, password kept as typed', () => {
+  const config = normalizeConfig({
+    http_interval: '5',
+    mqtt_topic: '  ',
+    language: 'it',
+    mqtt_password: ' secret ',
+  });
+  assert.equal(config.http_interval, 15);
+  assert.equal(normalizeConfig({ http_interval: 99999 }).http_interval, 3600);
+  assert.equal(normalizeConfig({ http_interval: 'abc' }).http_interval, 60);
+  assert.equal(config.mqtt_topic, 'weather/loop');
+  assert.equal(config.language, 'fr');
+  assert.equal(config.mqtt_password, ' secret ');
 });
 
-test('normalizeConfig falls back to the default for a missing numeric field', () => {
-  const config = normalizeConfig({ unit: 'celsius' });
-  assert.equal(config.poll_frequency, DEFAULT_CONFIG.poll_frequency);
-});
-
-test('GLADYS_PREFER_LOCAL defaults to true and only an explicit false disables it', () => {
-  assert.equal(normalizeConfig().GLADYS_PREFER_LOCAL, true);
-  assert.equal(normalizeConfig({ GLADYS_PREFER_LOCAL: true }).GLADYS_PREFER_LOCAL, true);
-  assert.equal(normalizeConfig({ GLADYS_PREFER_LOCAL: false }).GLADYS_PREFER_LOCAL, false);
+test('addresses in logs and messages lose their credentials and query', () => {
+  assert.equal(safeUrl('mqtt://user:pass@192.0.2.10:1883'), 'mqtt://192.0.2.10:1883');
+  assert.equal(safeUrl('http://u:p@h/json/weewx.json?token=x'), 'http://h/json/weewx.json');
+  assert.equal(safeUrl('nope'), '(invalid address)');
 });
