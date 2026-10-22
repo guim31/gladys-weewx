@@ -30,6 +30,20 @@ Gladys before reporting a problem.
 
 In scope: the code of this repository and the Docker image it publishes.
 
+What the integration handles:
+
+- **Secrets**: the MQTT password (a `secret` field of the configuration),
+  and any user name and password written in the broker or file address. They
+  are kept by Gladys, sent only to the broker or the web server they belong
+  to, and never written to the logs (addresses are logged without
+  credentials nor query string).
+- **Storage**: nothing is written to `/data`; the latest measurement only
+  lives in memory.
+- **Network**: outgoing connections only, on the local network, to the MQTT
+  broker and to the web server of WeeWX the user configured. No cloud service,
+  no listening port. MQTT messages and JSON files are parsed as untrusted
+  input (JSON only, files capped at 2 MB, unknown values dropped).
+
 Out of scope: Gladys Assistant itself (see its
 [security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-and the third-party services and devices the integration talks to.
+WeeWX, the MQTT broker and the weather station.
