@@ -326,7 +326,7 @@ test('"Check the sources" tells what each source gives, in four languages', asyn
   const { message } = ack.data;
   assert.deepEqual(Object.keys(message).sort(), ['de', 'en', 'es', 'fr']);
   assert.match(message.en, /MQTT: connected to mqtt:\/\/broker\.example:1883, topic weather\/loop/);
-  assert.match(message.en, /no message yet/);
+  assert.match(message.en, /No message yet/);
   assert.match(message.en, /HTTP: http:\/\/weewx\.example\/json\/weewx\.json read \(weewx-json\)/);
   assert.match(message.fr, /valeurs, dernière mesure/);
 });
@@ -378,4 +378,14 @@ test('a new configuration replaces the broker connection', async (t) => {
   await world.gladys.fake.configUpdated({ mqtt_url: 'mqtt://other.example' });
   assert.equal(world.broker.clients[0].ended, true);
   assert.equal(world.broker.connections[1].url, 'mqtt://other.example');
+});
+
+test('closing the broker connection on purpose is not an outage', async (t) => {
+  const world = await mqttWorld(t);
+  const first = world.broker.client;
+  await world.gladys.fake.configUpdated({ http_url: JSON_URL });
+  first.emit('close');
+  first.emit('error', new Error('client disconnecting'));
+  await flush();
+  assert.equal(world.gladys.fake.connectionStatus.connected, true);
 });

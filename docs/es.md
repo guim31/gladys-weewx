@@ -166,7 +166,7 @@ la medición. La frase sigue el idioma de la configuración.
 - **«No se puede acceder al broker MQTT»**: dirección o puerto incorrectos, o el broker está
   detenido. Gladys ejecuta la integración en un contenedor: `localhost` es el propio contenedor, use
   la dirección de la máquina.
-- **Conectado, pero «ningún mensaje todavía»**: weewx-mqtt publica en otro sitio. Compruebe su
+- **Conectado, pero «Ningún mensaje todavía»**: weewx-mqtt publica en otro sitio. Compruebe su
   `topic` (y el sufijo `/loop`) con un cliente MQTT como MQTT Explorer.
 - **«El archivo no tiene un formato WeeWX compatible»**: la dirección apunta a otro archivo (una
   página HTML, el `day.json` de Belchertown…). Use `weewx.json`, `current_minimal.json` o

@@ -167,7 +167,7 @@ export const REPORT_TEXT = {
   en: {
     mqttOk: (url, topic) => `MQTT: connected to ${url}, topic ${topic}.`,
     mqttDown: (url) => `MQTT: ${url} is not connected.`,
-    mqttSilent: 'no message yet (does WeeWX publish to this topic?)',
+    mqttSilent: 'No message yet: does WeeWX publish to this topic?',
     httpOk: (url, format) => `HTTP: ${url} read (${format}).`,
     httpDown: (url, error) => `HTTP: ${url} failed (${error}).`,
     received: (count, ago) => `${count} values, last measurement ${ago}.`,
@@ -175,7 +175,7 @@ export const REPORT_TEXT = {
   fr: {
     mqttOk: (url, topic) => `MQTT : connecté à ${url}, sujet ${topic}.`,
     mqttDown: (url) => `MQTT : ${url} n'est pas connecté.`,
-    mqttSilent: 'aucun message pour le moment (WeeWX publie-t-il sur ce sujet ?)',
+    mqttSilent: 'Aucun message pour le moment : WeeWX publie-t-il sur ce sujet ?',
     httpOk: (url, format) => `HTTP : ${url} lu (${format}).`,
     httpDown: (url, error) => `HTTP : échec sur ${url} (${error}).`,
     received: (count, ago) => `${count} valeurs, dernière mesure ${ago}.`,
@@ -183,7 +183,7 @@ export const REPORT_TEXT = {
   de: {
     mqttOk: (url, topic) => `MQTT: verbunden mit ${url}, Topic ${topic}.`,
     mqttDown: (url) => `MQTT: ${url} ist nicht verbunden.`,
-    mqttSilent: 'noch keine Nachricht (veröffentlicht WeeWX in dieses Topic?)',
+    mqttSilent: 'Noch keine Nachricht: Veröffentlicht WeeWX in dieses Topic?',
     httpOk: (url, format) => `HTTP: ${url} gelesen (${format}).`,
     httpDown: (url, error) => `HTTP: ${url} fehlgeschlagen (${error}).`,
     received: (count, ago) => `${count} Werte, letzte Messung ${ago}.`,
@@ -191,7 +191,7 @@ export const REPORT_TEXT = {
   es: {
     mqttOk: (url, topic) => `MQTT: conectado a ${url}, tema ${topic}.`,
     mqttDown: (url) => `MQTT: ${url} no está conectado.`,
-    mqttSilent: 'ningún mensaje todavía (¿publica WeeWX en este tema?)',
+    mqttSilent: 'Ningún mensaje todavía: ¿publica WeeWX en este tema?',
     httpOk: (url, format) => `HTTP: ${url} leído (${format}).`,
     httpDown: (url, error) => `HTTP: fallo en ${url} (${error}).`,
     received: (count, ago) => `${count} valores, última medición ${ago}.`,

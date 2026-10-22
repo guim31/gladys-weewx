@@ -167,7 +167,7 @@ Messung. Der Satz folgt der Sprache der Konfiguration.
 - **„Der MQTT-Broker ist nicht erreichbar“**: Adresse oder Port falsch, oder der Broker läuft nicht.
   Gladys führt die Integration in einem Container aus: `localhost` ist der Container selbst, nimm
   stattdessen die Adresse des Rechners.
-- **Verbunden, aber „noch keine Nachricht“**: weewx-mqtt veröffentlicht woanders. Prüfe sein
+- **Verbunden, aber „Noch keine Nachricht“**: weewx-mqtt veröffentlicht woanders. Prüfe sein
   `topic` (und das Suffix `/loop`) mit einem MQTT-Client wie MQTT Explorer.
 - **„Die Datei hat kein unterstütztes WeeWX-Format“**: Die Adresse zeigt auf eine andere Datei (eine
   HTML-Seite, die `day.json` von Belchertown…). Nimm `weewx.json`, `current_minimal.json` oder

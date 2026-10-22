@@ -170,7 +170,7 @@ mesure. La phrase suit la langue de la configuration.
 - **« Le broker MQTT est injoignable »** : adresse ou port erronés, ou broker arrêté. Gladys fait
   tourner l'intégration dans un conteneur : `localhost` désigne le conteneur lui-même, utilisez
   plutôt l'adresse de la machine.
-- **Connecté, mais « aucun message pour le moment »** : weewx-mqtt publie ailleurs. Vérifiez son
+- **Connecté, mais « Aucun message pour le moment »** : weewx-mqtt publie ailleurs. Vérifiez son
   `topic` (et le suffixe `/loop`) avec un client MQTT comme MQTT Explorer.
 - **« Le fichier n'est pas dans un format WeeWX pris en charge »** : l'adresse désigne un autre
   fichier (une page HTML, le `day.json` de Belchertown…). Utilisez `weewx.json`,

@@ -38,6 +38,7 @@ export function createMqttSource({
 }) {
   let state = null;
   let lastMessageAt = null;
+  let stopped = false;
   const parsed = new URL(url);
   // Credentials typed in the URL (mqtt://user:pass@host) are honoured, the
   // dedicated fields win.
@@ -56,7 +57,9 @@ export function createMqttSource({
   });
 
   const setState = (next, detail) => {
-    if (state === next) {
+    // Closing the client on purpose (new configuration, shutdown) is not an
+    // outage.
+    if (stopped || state === next) {
       return;
     }
     state = next;
@@ -111,6 +114,7 @@ export function createMqttSource({
       return lastMessageAt;
     },
     stop() {
+      stopped = true;
       client.removeAllListeners('message');
       client.end(true);
     },
