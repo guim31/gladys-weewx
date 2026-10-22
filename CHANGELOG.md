@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-22
+
 ### Added
 
 - The WeeWX station in Gladys, read over MQTT (weewx-mqtt extension, live) or
@@ -27,3 +29,6 @@ the notes of the version's GitHub Release.
 - Dashboard widget "WeeWX station".
 - "Check the sources" button in the configuration.
 - English, French, German and Spanish texts and documentation.
+
+[Unreleased]: https://github.com/guim31/gladys-weewx/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-weewx/releases/tag/v1.0.0
