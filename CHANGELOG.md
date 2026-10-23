@@ -10,6 +10,11 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Fixed
+
+- The connection messages (broker or file unreachable, wrong password…) now reach
+  Gladys: they were sent as a single-language string, which Gladys 5.2 refuses.
+
 ## [1.0.0] - 2026-10-22
 
 ### Added

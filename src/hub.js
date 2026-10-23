@@ -263,9 +263,10 @@ export class WeewxHub {
     if (pending) {
       return;
     }
-    const language = config?.language ?? 'en';
+    // The core wants every language ({ en, fr, de, es }) and answers 400 to a
+    // plain string: Gladys picks the user's language itself.
     await this.gladys
-      .setConnectionStatus(message === null, message === null ? undefined : message[language])
+      .setConnectionStatus(message === null, message === null ? undefined : message)
       .catch(() => {});
   }
 
@@ -413,9 +414,7 @@ export class WeewxHub {
       }
     } catch (err) {
       this.issues.fail('discovery', `Publishing the station failed: ${err.message}`);
-      await this.gladys
-        .setConnectionStatus(false, MESSAGES.publishFailed[this.config?.language ?? 'en'])
-        .catch(() => {});
+      await this.gladys.setConnectionStatus(false, MESSAGES.publishFailed).catch(() => {});
       this.status = 'publish-failed';
     }
   }

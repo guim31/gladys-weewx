@@ -234,13 +234,13 @@ test('broker refusing the credentials, broker down: told to Gladys in the langua
   world.broker.client.emit('error', refused);
   await flush();
   assert.equal(world.gladys.fake.connectionStatus.connected, false);
-  assert.match(world.gladys.fake.connectionStatus.message, /user name and the password/);
+  assert.match(world.gladys.fake.connectionStatus.message.en, /user name and the password/);
   world.broker.accept();
   await flush();
   assert.equal(world.gladys.fake.connectionStatus.connected, true);
   world.broker.client.emit('offline');
   await flush();
-  assert.match(world.gladys.fake.connectionStatus.message, /cannot be reached/);
+  assert.match(world.gladys.fake.connectionStatus.message.en, /cannot be reached/);
 });
 
 test('a message that is not a WeeWX packet is ignored', async (t) => {
@@ -276,11 +276,11 @@ test('HTTP: a server down, an unknown file, a file without date', async (t) => {
   world.server.failure = 'down';
   await advance(60 * SECOND);
   assert.equal(world.gladys.fake.connectionStatus.connected, false);
-  assert.match(world.gladys.fake.connectionStatus.message, /cannot be read/);
+  assert.match(world.gladys.fake.connectionStatus.message.en, /cannot be read/);
   world.server.failure = null;
   world.server.files[JSON_URL] = { hello: 'world' };
   await advance(60 * SECOND);
-  assert.match(world.gladys.fake.connectionStatus.message, /not one of the supported/);
+  assert.match(world.gladys.fake.connectionStatus.message.en, /not one of the supported/);
   const dateless = structuredClone(FIXTURES.weewxJson);
   dateless.generation.time = 'Thu, 22 Oct 2026 05:47:00 UTC-ish';
   world.server.files[JSON_URL] = dateless;
@@ -308,7 +308,10 @@ test('nothing configured: Gladys says what to fill in', async (t) => {
   const world = await createWorld({ config: {} });
   t.after(() => world.app.stop());
   assert.equal(world.gladys.fake.connectionStatus.connected, false);
-  assert.match(world.gladys.fake.connectionStatus.message, /broker MQTT/);
+  // Every language, never a plain string: the core answers 400 to a string.
+  const { message } = world.gladys.fake.connectionStatus;
+  assert.deepEqual(Object.keys(message).sort(), ['de', 'en', 'es', 'fr']);
+  assert.match(message.fr, /broker MQTT/);
   const ack = await world.gladys.fake.action('check_sources', {});
   assert.equal(ack.success, false);
 });
