@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-23
+
 ### Fixed
 
 - The connection messages (broker or file unreachable, wrong password…) now reach
@@ -35,5 +37,6 @@ the notes of the version's GitHub Release.
 - "Check the sources" button in the configuration.
 - English, French, German and Spanish texts and documentation.
 
-[Unreleased]: https://github.com/guim31/gladys-weewx/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/guim31/gladys-weewx/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/guim31/gladys-weewx/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/guim31/gladys-weewx/releases/tag/v1.0.0

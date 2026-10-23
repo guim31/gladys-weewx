@@ -1,6 +1,6 @@
 {
   "name": "gladys-weewx",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Gladys Assistant integration for WeeWX weather stations: live measurements over MQTT (weewx-mqtt) or from a JSON skin over HTTP.",
   "type": "module",
